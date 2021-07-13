@@ -443,7 +443,7 @@ This is an optional feature that can be turned on by activating its feature flag
     }
 
 
-For this feature you will need a cache system and celery workers. All thumbnails are store on cache and are processed
+For this feature you will need a cache system and celery workers. All thumbnails are stored on cache and are processed
 asynchronously by the workers.
 
 An example config where images are stored on S3 could be:
@@ -1571,6 +1571,7 @@ Second step: Create a `CustomSsoSecurityManager` that extends `SupersetSecurityM
 
 .. code-block:: python
 
+    import logging
     from superset.security import SupersetSecurityManager
 
     class CustomSsoSecurityManager(SupersetSecurityManager):

@@ -22,6 +22,7 @@ import {
   SetDataMaskHook,
   SuperChart,
   AppSection,
+  t,
 } from '@superset-ui/core';
 import { FormInstance } from 'antd/lib/form';
 import Loading from 'src/components/Loading';
@@ -29,6 +30,7 @@ import { NativeFiltersForm } from '../types';
 import { getFormData } from '../../utils';
 
 type DefaultValueProps = {
+  hasDefaultValue: boolean;
   filterId: string;
   setDataMask: SetDataMaskHook;
   hasDataset: boolean;
@@ -38,6 +40,7 @@ type DefaultValueProps = {
 };
 
 const DefaultValue: FC<DefaultValueProps> = ({
+  hasDefaultValue,
   filterId,
   hasDataset,
   form,
@@ -56,7 +59,9 @@ const DefaultValue: FC<DefaultValueProps> = ({
       setLoading(true);
     }
   }, [hasDataset, queriesData]);
-
+  const value = formFilter.defaultDataMask?.filterState.value;
+  const isMissingRequiredValue =
+    hasDefaultValue && (value === null || value === undefined);
   return loading ? (
     <Loading position="inline-centered" />
   ) : (
@@ -73,7 +78,11 @@ const DefaultValue: FC<DefaultValueProps> = ({
       chartType={formFilter?.filterType}
       hooks={{ setDataMask }}
       enableNoResults={enableNoResults}
-      filterState={formFilter.defaultDataMask?.filterState}
+      filterState={{
+        ...formFilter.defaultDataMask?.filterState,
+        validateMessage: isMissingRequiredValue && t('Value is required'),
+        validateStatus: isMissingRequiredValue && 'error',
+      }}
     />
   );
 };

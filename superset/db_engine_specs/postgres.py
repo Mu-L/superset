@@ -85,6 +85,8 @@ COLUMN_DOES_NOT_EXIST_REGEX = re.compile(
     r"does not exist\s+LINE (?P<location>\d+?)"
 )
 
+SYNTAX_ERROR_REGEX = re.compile('syntax error at or near "(?P<syntax_error>.*?)"')
+
 
 class PostgresBaseEngineSpec(BaseEngineSpec):
     """ Abstract class for Postgres 'like' databases """
@@ -151,6 +153,14 @@ class PostgresBaseEngineSpec(BaseEngineSpec):
             SupersetErrorType.COLUMN_DOES_NOT_EXIST_ERROR,
             {},
         ),
+        SYNTAX_ERROR_REGEX: (
+            __(
+                "Please check your query for syntax errors at or "
+                'near "%(syntax_error)s". Then, try running your query again.'
+            ),
+            SupersetErrorType.SYNTAX_ERROR,
+            {},
+        ),
     }
 
     @classmethod
@@ -176,7 +186,7 @@ class PostgresEngineSpec(PostgresBaseEngineSpec, BasicParametersMixin):
         "postgresql://user:password@host:port/dbname[?key=value&key=value...]"
     )
     # https://www.postgresql.org/docs/9.1/libpq-ssl.html#LIBQ-SSL-CERTIFICATES
-    encryption_parameters = {"sslmode": "verify-ca"}
+    encryption_parameters = {"sslmode": "require"}
 
     max_column_name_length = 63
     try_remove_schema_from_table_name = False

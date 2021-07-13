@@ -26,11 +26,9 @@ import {
   GenericDataType,
   JsonObject,
   smartDateDetailedFormatter,
-  styled,
   t,
   tn,
 } from '@superset-ui/core';
-import { FormItem } from 'src/components/Form';
 import React, {
   RefObject,
   ReactElement,
@@ -45,8 +43,9 @@ import { SLOW_DEBOUNCE } from 'src/constants';
 import { useImmerReducer } from 'use-immer';
 import Icons from 'src/components/Icons';
 import { usePrevious } from 'src/common/hooks/usePrevious';
+import { FormItemProps } from 'antd/lib/form';
 import { PluginFilterSelectProps, SelectValue } from './types';
-import { StyledSelect, Styles } from '../common';
+import { StyledFormItem, StyledSelect, Styles, StatusMessage } from '../common';
 import { getDataRecordFormatter, getSelectExtraFormData } from '../../utils';
 
 const { Option } = Select;
@@ -81,10 +80,6 @@ function reducer(
       return draft;
   }
 }
-
-const Error = styled.div`
-  color: ${({ theme }) => theme.colors.error.base};
-`;
 
 export default function PluginFilterSelect(props: PluginFilterSelectProps) {
   const {
@@ -153,6 +148,7 @@ export default function PluginFilterSelect(props: PluginFilterSelectProps) {
           inverseSelection,
         ),
         filterState: {
+          ...filterState,
           label: values?.length
             ? `${(values || []).join(', ')}${suffix}`
             : undefined,
@@ -277,14 +273,23 @@ export default function PluginFilterSelect(props: PluginFilterSelectProps) {
       : tn('%s option', '%s options', data.length, data.length);
   const Icon = inverseSelection ? Icons.StopOutlined : Icons.CheckOutlined;
 
+  const formItemData: FormItemProps = {};
+  if (filterState.validateMessage) {
+    formItemData.extra = (
+      <StatusMessage status={filterState.validateStatus}>
+        {filterState.validateMessage}
+      </StatusMessage>
+    );
+  }
+
   return (
     <Styles height={height} width={width}>
-      <FormItem
+      <StyledFormItem
         validateStatus={filterState.validateStatus}
-        extra={<Error>{filterState.validateMessage}</Error>}
+        {...formItemData}
       >
         <StyledSelect
-          allowClear={!enableEmptyFilter}
+          allowClear
           // @ts-ignore
           value={filterState.value || []}
           disabled={isDisabled}
@@ -329,7 +334,7 @@ export default function PluginFilterSelect(props: PluginFilterSelectProps) {
               </Option>
             )}
         </StyledSelect>
-      </FormItem>
+      </StyledFormItem>
     </Styles>
   );
 }

@@ -51,8 +51,10 @@ const propTypes = {
   addSuccessToast: PropTypes.func.isRequired,
   addDangerToast: PropTypes.func.isRequired,
   addWarningToast: PropTypes.func.isRequired,
+  userId: PropTypes.number,
   dashboardInfo: PropTypes.object.isRequired,
   dashboardTitle: PropTypes.string.isRequired,
+  dataMask: PropTypes.object.isRequired,
   charts: PropTypes.objectOf(chartPropShape).isRequired,
   layout: PropTypes.object.isRequired,
   expandedSlices: PropTypes.object.isRequired,
@@ -326,7 +328,7 @@ class Header extends React.PureComponent {
     if (positionJSONLength >= limit) {
       this.props.addDangerToast(
         t(
-          'Your dashboard is too large. Please reduce the size before save it.',
+          'Your dashboard is too large. Please reduce its size before saving it.',
         ),
       );
     } else {
@@ -353,6 +355,7 @@ class Header extends React.PureComponent {
       expandedSlices,
       customCss,
       colorNamespace,
+      dataMask,
       setColorSchemeAndUnsavedChanges,
       colorScheme,
       onUndo,
@@ -364,6 +367,7 @@ class Header extends React.PureComponent {
       updateCss,
       editMode,
       isPublished,
+      userId,
       dashboardInfo,
       hasUnsavedChanges,
       isLoading,
@@ -402,7 +406,7 @@ class Header extends React.PureComponent {
             canEdit={userCanEdit}
             canSave={userCanSaveAs}
           />
-          {dashboardInfo.userId && (
+          {userId && (
             <FaveStar
               itemId={dashboardInfo.id}
               fetchFaveStar={this.props.fetchFaveStar}
@@ -526,6 +530,7 @@ class Header extends React.PureComponent {
             dashboardId={dashboardInfo.id}
             dashboardTitle={dashboardTitle}
             dashboardInfo={dashboardInfo}
+            dataMask={dataMask}
             layout={layout}
             expandedSlices={expandedSlices}
             customCss={customCss}
